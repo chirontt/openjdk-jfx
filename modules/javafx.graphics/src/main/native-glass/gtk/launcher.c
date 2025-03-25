@@ -25,7 +25,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef __linux__
 #include <linux/fb.h>
+#endif
 #include <fcntl.h>
 #ifndef __USE_GNU       // required for dladdr() & Dl_info
 #define __USE_GNU

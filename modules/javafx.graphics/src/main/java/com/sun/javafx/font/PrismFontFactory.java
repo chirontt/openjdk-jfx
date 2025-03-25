@@ -51,6 +51,7 @@ public abstract class PrismFontFactory implements FontFactory {
     public static final boolean debugFonts;
     public static final boolean isWindows;
     public static final boolean isLinux;
+    public static final boolean isBSD;
     public static final boolean isMacOSX;
     public static final boolean isIOS;
     public static final boolean isAndroid;
@@ -88,6 +89,7 @@ public abstract class PrismFontFactory implements FontFactory {
         isWindows = PlatformUtil.isWindows();
         isMacOSX  = PlatformUtil.isMac();
         isLinux   = PlatformUtil.isLinux();
+        isBSD   = PlatformUtil.isBSD();
         isIOS     = PlatformUtil.isIOS();
         isAndroid = PlatformUtil.isAndroid();
         isEmbedded = PlatformUtil.isEmbedded();
@@ -166,7 +168,7 @@ public abstract class PrismFontFactory implements FontFactory {
     private static String getNativeFactoryName() {
         if (isWindows) return DW_FACTORY;
         if (isMacOSX || isIOS) return CT_FACTORY;
-        if (isLinux || isAndroid) return FT_FACTORY;
+        if (isBSD || isLinux || isAndroid) return FT_FACTORY;
         return null;
     }
 
@@ -853,7 +855,7 @@ public abstract class PrismFontFactory implements FontFactory {
                         break;
                     }
                 }
-                if (fontResource == null && isLinux) {
+                if (fontResource == null && (isBSD || isLinux)) {
                     String path = FontConfigManager.getDefaultFontPath();
                     if (path != null) {
                         fontResource = createFontResource(jreDefaultFontLC,
@@ -1774,7 +1776,7 @@ public abstract class PrismFontFactory implements FontFactory {
                                                       familyToFontListMap,
                                                       Locale.ENGLISH);
 
-            } else if (isLinux) {
+            } else if (isBSD || isLinux) {
                 FontConfigManager.populateMaps(tmpFontToFileMap,
                                                fontToFamilyNameMap,
                                                familyToFontListMap,

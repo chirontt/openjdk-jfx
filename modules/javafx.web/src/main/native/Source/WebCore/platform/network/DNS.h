@@ -32,6 +32,10 @@
 #include <netinet/in.h>
 #endif
 
+#if OS(FREEBSD)
+#include <sys/socket.h>
+#endif
+
 #include <wtf/Forward.h>
 #include <wtf/Optional.h>
 #include <wtf/Variant.h>

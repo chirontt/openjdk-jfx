@@ -23,7 +23,7 @@
  * questions.
  */
 
-#if defined __linux__
+#if defined __FreeBSD__ || defined __linux__
 #if defined _ENABLE_PANGO
 
 #include <jni.h>

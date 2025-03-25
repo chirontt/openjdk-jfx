@@ -183,7 +183,9 @@ public abstract class Toolkit {
     }
 
     private static String getDefaultToolkit() {
-        if (PlatformUtil.isWindows()) {
+        if (PlatformUtil.isBSD()) {
+            return DEFAULT_TOOLKIT;
+        } else if (PlatformUtil.isWindows()) {
             return DEFAULT_TOOLKIT;
         } else if (PlatformUtil.isMac()) {
             return DEFAULT_TOOLKIT;

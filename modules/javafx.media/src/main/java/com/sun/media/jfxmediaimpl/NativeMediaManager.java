@@ -111,7 +111,7 @@ public class NativeMediaManager {
                     NativeLibLoader.loadLibrary("glib-lite");
                 }
 
-                if (!HostUtils.isLinux() && !HostUtils.isIOS()) {
+                if (!HostUtils.isBSD() && !HostUtils.isLinux() && !HostUtils.isIOS()) {
                     NativeLibLoader.loadLibrary("gstreamer-lite");
                 } else {
                     dependencies.add("gstreamer-lite");

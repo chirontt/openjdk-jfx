@@ -26,7 +26,7 @@
 #ifndef _Prism_es2_defs_h_
 #define _Prism_es2_defs_h_
 
-#if defined(SOLARIS) || defined(LINUX) || defined(ANDROID_NDK) /* SOLARIS || LINUX */
+#if defined(SOLARIS) || defined(LINUX) || defined(ANDROID_NDK) || defined(__FreeBSD__) /* SOLARIS || LINUX */
 #define GLX_GLEXT_PROTOTYPES
 #define GLX_GLXEXT_PROTOTYPES
 #define UNIX

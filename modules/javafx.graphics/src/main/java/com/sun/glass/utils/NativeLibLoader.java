@@ -361,7 +361,7 @@ public class NativeLibLoader {
                     relativeDir = "../bin";
                 } else if (osName.startsWith("Mac")) {
                     relativeDir = ".";
-                } else if (osName.startsWith("Linux")) {
+                } else if (osName.startsWith("Linux") || osName.endsWith("BSD")) {
                     relativeDir = ".";
                 }
 
@@ -377,7 +377,7 @@ public class NativeLibLoader {
                 } else if (osName.startsWith("Mac")) {
                     libPrefix = "lib";
                     libSuffix = ".dylib";
-                } else if (osName.startsWith("Linux")) {
+                } else if (osName.startsWith("Linux") || osName.endsWith("BSD")) {
                     libPrefix = "lib";
                     libSuffix = ".so";
                 }

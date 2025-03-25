@@ -1056,7 +1056,7 @@ public class JFXPanel extends JComponent {
         public boolean grabFocus() {
             // On X11 grab is limited to a single XDisplay connection,
             // so we can't delegate it to another GUI toolkit.
-            if (PlatformUtil.isLinux()) return true;
+            if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) return true;
 
             invokeOnClientEDT(() -> {
                 Window window = SwingUtilities.getWindowAncestor(JFXPanel.this);
@@ -1072,7 +1072,7 @@ public class JFXPanel extends JComponent {
         public void ungrabFocus() {
             // On X11 grab is limited to a single XDisplay connection,
             // so we can't delegate it to another GUI toolkit.
-            if (PlatformUtil.isLinux()) return;
+            if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) return;
 
             invokeOnClientEDT(() -> {
                 Window window = SwingUtilities.getWindowAncestor(JFXPanel.this);

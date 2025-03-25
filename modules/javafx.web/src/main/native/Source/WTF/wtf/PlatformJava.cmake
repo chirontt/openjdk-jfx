@@ -87,6 +87,8 @@ elseif (UNIX)
         linux/CurrentProcessMemoryStatus.cpp
         linux/MemoryFootprintLinux.cpp
         linux/MemoryPressureHandlerLinux.cpp
+        generic/MemoryFootprintGeneric.cpp
+        unix/MemoryPressureHandlerUnix.cpp
         unix/CPUTimeUnix.cpp
         unix/LanguageUnix.cpp
     )

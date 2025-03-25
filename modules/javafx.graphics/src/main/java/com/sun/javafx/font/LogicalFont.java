@@ -175,7 +175,7 @@ public class LogicalFont implements CompositeFontResource {
             styleName = STYLE_BOLD_ITALIC;
         }
         fullName = familyName + " " + styleName;
-        if (PrismFontFactory.isLinux) {
+        if (PrismFontFactory.isLinux || PrismFontFactory.isBSD) {
             FontConfigManager.FcCompFont fcCompFont =
                 FontConfigManager.getFontConfigFont(family, bold, italic);
             physicalFullName = fcCompFont.firstFont.fullName;

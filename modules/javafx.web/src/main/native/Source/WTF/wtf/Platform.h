@@ -39,6 +39,12 @@
 /* CPU() - the target CPU architecture */
 #include <wtf/PlatformCPU.h>
 
+#if !CPU(ARM_THUMB2) && !CPU(ARM_TRADITIONAL) && !CPU(X86) && !CPU(X86_64) && !CPU(SH4) && !CPU(ARM64)
+#define ENABLE_ASSEMBLER 0
+#define ENABLE_JIT 0
+#define ENABLE_YARR_JIT 0
+#endif
+
 /* OS() - underlying operating system; only to be used for mandated low-level services like
    virtual memory, not to choose a GUI toolkit */
 #include <wtf/PlatformOS.h>

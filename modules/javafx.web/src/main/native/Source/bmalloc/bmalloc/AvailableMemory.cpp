@@ -50,7 +50,6 @@
 #elif BOS(FREEBSD)
 #include "VMAllocate.h"
 #include <sys/sysctl.h>
-#include <sys/sysinfo.h>
 #include <sys/types.h>
 #include <sys/user.h>
 #endif
@@ -170,10 +169,9 @@ static size_t computeAvailableMemory()
 #elif BOS(LINUX)
     return LinuxMemory::singleton().availableMemory;
 #elif BOS(FREEBSD)
-    struct sysinfo info;
-    if (!sysinfo(&info))
-        return info.totalram * info.mem_unit;
-    return availableMemoryGuess;
+    size_t page_size = sysconf(_SC_PAGESIZE);
+    size_t phys_pages = sysconf(_SC_PHYS_PAGES);
+    return page_size * phys_pages;
 #elif BOS(UNIX)
     long pages = sysconf(_SC_PHYS_PAGES);
     long pageSize = sysconf(_SC_PAGE_SIZE);

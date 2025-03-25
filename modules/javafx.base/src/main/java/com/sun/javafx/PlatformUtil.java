@@ -78,6 +78,7 @@ public class PlatformUtil {
             doEGLCompositing = false;
     }
 
+    private static final boolean BSD = os.endsWith("BSD");
     private static final boolean ANDROID = "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name"));
     private static final boolean WINDOWS = os.startsWith("Windows");
     private static final boolean WINDOWS_VISTA_OR_LATER = WINDOWS && versionNumberGreaterThanOrEqualTo(6.0f);
@@ -103,6 +104,13 @@ public class PlatformUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Returns true if the operating system is a form of BSD.
+     */
+    public static boolean isBSD(){
+        return BSD;
     }
 
     /**
@@ -166,10 +174,10 @@ public class PlatformUtil {
     }
 
     /**
-     * Returns true if the operating system is a form of Linux or Solaris
+     * Returns true if the operating system is a form of Linux, Solaris or BSD
      */
     public static boolean isUnix(){
-        return LINUX || SOLARIS;
+        return LINUX || SOLARIS || BSD;
     }
 
     /**

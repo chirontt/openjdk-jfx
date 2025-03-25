@@ -38,6 +38,10 @@
 #include <bmalloc/bmalloc.h>
 #endif
 
+#if OS(FREEBSD)
+#include <unistd.h> // Introduced to use sysconf(int name)
+#endif
+
 namespace WTF {
 
 #if OS(WINDOWS)
@@ -54,13 +58,17 @@ static size_t computeRAMSize()
         return ramSizeGuess;
     return status.ullTotalPhys;
 #elif USE(SYSTEM_MALLOC)
-#if OS(LINUX) || OS(FREEBSD)
+#if OS(LINUX)
     struct sysinfo si;
     sysinfo(&si);
     return si.totalram * si.mem_unit;
+#elif OS(FREEBSD)
+    size_t page_size = sysconf(_SC_PAGESIZE);
+    size_t phys_pages = sysconf(_SC_PHYS_PAGES);
+    return page_size * phys_pages;
 #else
 #error "Missing a platform specific way of determining the available RAM"
-#endif // OS(LINUX) || OS(FREEBSD)
+#endif // OS(LINUX)
 #else
     return bmalloc::api::availableMemory();
 #endif

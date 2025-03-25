@@ -68,6 +68,10 @@ public class HostUtils {
         return osName.startsWith("linux");
     }
 
+    public static boolean isBSD() {
+        return osName.endsWith("bsd");
+    }
+
     public static boolean isIOS() {
         return osName.startsWith("ios");
     }

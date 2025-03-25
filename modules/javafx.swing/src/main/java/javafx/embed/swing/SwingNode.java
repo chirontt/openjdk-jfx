@@ -707,7 +707,7 @@ public class SwingNode extends Node {
         if (lwFrame == null) {
             return;
         }
-        if (PlatformUtil.isLinux()) {
+        if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) {
             // Workaround to block FocusOut/FocusIn notifications from Unity
             // focus grabbing upon Alt press
             if (deactivate == null || !deactivate.isRunning()) {

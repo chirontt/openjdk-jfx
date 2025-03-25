@@ -460,7 +460,7 @@ class WindowStage extends GlassStage {
         } else if (PlatformUtil.isWindows()) { //Windows Sized Icons
             SMALL_ICON_HEIGHT = 32;
             SMALL_ICON_WIDTH = 32;
-        } else if (PlatformUtil.isLinux()) { //Linux icons
+        } else if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) { //Linux icons
             SMALL_ICON_HEIGHT = 128;
             SMALL_ICON_WIDTH = 128;
         }

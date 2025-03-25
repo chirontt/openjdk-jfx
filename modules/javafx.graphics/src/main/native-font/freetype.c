@@ -23,7 +23,7 @@
  * questions.
  */
 
-#if defined __linux__ || ANDROID_NDK
+#if defined __FreeBSD__  || defined __linux__ || ANDROID_NDK
 #if defined _ENABLE_PANGO || _ENABLE_HARFBUZZ
 
 #include <jni.h>
