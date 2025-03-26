@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2008, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -441,7 +441,7 @@ class WindowStage extends GlassStage {
         } else if (PlatformUtil.isWindows()) { //Windows Sized Icons
             SMALL_ICON_HEIGHT = 32;
             SMALL_ICON_WIDTH = 32;
-        } else if (PlatformUtil.isLinux()) { //Linux icons
+        } else if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) { //Unix icons
             SMALL_ICON_HEIGHT = 128;
             SMALL_ICON_WIDTH = 128;
         }
