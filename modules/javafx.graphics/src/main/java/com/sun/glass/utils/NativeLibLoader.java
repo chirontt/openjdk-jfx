@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -363,7 +363,7 @@ public class NativeLibLoader {
             relativeDir = "../bin";
         } else if (osName.startsWith("Mac")) {
             relativeDir = ".";
-        } else if (osName.startsWith("Linux")) {
+        } else if (osName.startsWith("Linux") || osName.endsWith("BSD")) {
             relativeDir = ".";
         }
 
@@ -401,7 +401,7 @@ public class NativeLibLoader {
                 } else if (osName.startsWith("Mac")) {
                     libPrefix = "lib";
                     libSuffix = ".dylib";
-                } else if (osName.startsWith("Linux")) {
+                } else if (osName.startsWith("Linux") || osName.endsWith("BSD")) {
                     libPrefix = "lib";
                     libSuffix = ".so";
                 }

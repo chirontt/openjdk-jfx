@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2021, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -45,6 +45,7 @@ public class HostUtils {
 
             is64bit =  osArch.equals("x64")
                     || osArch.equals("x86_64")
+                    || osArch.equals("amd64")
                     || osArch.equals("ia64");
 
             return Boolean.getBoolean("com.sun.javafx.isEmbedded");
@@ -66,6 +67,10 @@ public class HostUtils {
 
     public static boolean isLinux() {
         return osName.startsWith("linux");
+    }
+
+    public static boolean isBSD() {
+        return osName.endsWith("bsd");
     }
 
     public static boolean isIOS() {

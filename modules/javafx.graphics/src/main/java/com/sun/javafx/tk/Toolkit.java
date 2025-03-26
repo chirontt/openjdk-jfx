@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -185,7 +185,9 @@ public abstract class Toolkit {
     }
 
     private static String getDefaultToolkit() {
-        if (PlatformUtil.isWindows()) {
+        if (PlatformUtil.isBSD()) {
+            return DEFAULT_TOOLKIT;
+        } else if (PlatformUtil.isWindows()) {
             return DEFAULT_TOOLKIT;
         } else if (PlatformUtil.isMac()) {
             return DEFAULT_TOOLKIT;
