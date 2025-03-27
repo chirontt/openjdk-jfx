@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -55,6 +55,7 @@ import javafx.scene.input.MouseEvent;
 import java.text.Bidi;
 import java.util.function.Predicate;
 
+import static com.sun.javafx.PlatformUtil.isBSD;
 import static com.sun.javafx.PlatformUtil.isLinux;
 import static com.sun.javafx.PlatformUtil.isMac;
 import static com.sun.javafx.PlatformUtil.isWindows;
@@ -120,6 +121,7 @@ public abstract class TextInputControlBehavior<T extends TextInputControl> exten
         final Predicate<KeyEvent> validWhenEditable = e -> !c.isEditable();
         final Predicate<KeyEvent> validOnWindows = e -> !PlatformUtil.isWindows();
         final Predicate<KeyEvent> validOnLinux = e -> !PlatformUtil.isLinux();
+        final Predicate<KeyEvent> validOnFreeBSD = e -> !PlatformUtil.isBSD();
 
         KeyMapping cancelEditMapping;
         KeyMapping fireMapping;
@@ -566,7 +568,7 @@ public abstract class TextInputControlBehavior<T extends TextInputControl> exten
 
     public void selectNextWord() {
         TextInputControl textInputControl = getNode();
-        if (isMac() || isLinux()) {
+        if (isMac() || isLinux() || isBSD()) {
             textInputControl.selectEndOfNextWord();
         } else {
             textInputControl.selectNextWord();
@@ -615,7 +617,7 @@ public abstract class TextInputControlBehavior<T extends TextInputControl> exten
 
     protected void nextWord() {
         TextInputControl textInputControl = getNode();
-        if (isMac() || isLinux()) {
+        if (isMac() || isLinux() || isBSD()) {
             textInputControl.endOfNextWord();
         } else {
             textInputControl.nextWord();
