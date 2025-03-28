@@ -87,6 +87,7 @@ elseif (UNIX)
         generic/WorkQueueGeneric.cpp
         linux/CurrentProcessMemoryStatus.cpp
         linux/MemoryFootprintLinux.cpp
+        generic/MemoryFootprintGeneric.cpp
         unix/LanguageUnix.cpp
         unix/MemoryPressureHandlerUnix.cpp
         linux/RealTimeThreads.cpp
