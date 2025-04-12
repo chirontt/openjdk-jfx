@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -23,7 +23,7 @@
  * questions.
  */
 
-#if defined __linux__ || ANDROID_NDK
+#if defined __FreeBSD__  || defined __linux__ || ANDROID_NDK
 #if defined _ENABLE_PANGO || _ENABLE_HARFBUZZ
 
 #include <jni.h>
