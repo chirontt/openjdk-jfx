@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008 Collin Jackson  <collinj@webkit.org>
+ * Copyright (C) 2008-2025 Collin Jackson  <collinj@webkit.org>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,6 +35,10 @@
 #include <ws2tcpip.h>
 #else
 #include <netinet/in.h>
+#endif
+
+#if OS(FREEBSD)
+#include <sys/socket.h>
 #endif
 
 namespace WebCore {

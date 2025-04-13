@@ -113,6 +113,7 @@ JNIEXPORT void JNICALL Java_com_sun_glass_ui_gtk_GtkApplication__1initGTK
 
     gdk_threads_enter();
     gtk_init(NULL, NULL);
+    gdk_threads_leave();
 
     // Major version is checked before loading
     if (version == 3

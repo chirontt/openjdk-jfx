@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -197,7 +197,7 @@ void compileTargets(Closure c) {
  * passing it to the processor closure.
  *
  * This is used on windows to produce a properties file containing all the
- * windows visual studio paths and environment variables, and on Linux
+ * windows visual studio paths and environment variables, and on Linux or BSD
  * for storing the results of pkg-config calls.
  *
  * @param name the name of the file to produce
@@ -337,6 +337,8 @@ ext.IS_RISCV64 = OS_ARCH.toLowerCase().contains("riscv64")
 ext.IS_MAC = OS_NAME.contains("mac") || OS_NAME.contains("darwin")
 ext.IS_WINDOWS = OS_NAME.contains("windows")
 ext.IS_LINUX = OS_NAME.contains("linux")
+ext.IS_BSD = OS_NAME.contains("bsd")
+ext.IS_FREEBSD = OS_NAME.contains("freebsd")
 
 ext.MAVEN_GROUP_ID = "org.openjfx"
 
@@ -351,14 +353,19 @@ ext.allowSunMiscUnsafe = '--sun-misc-unsafe-memory-access=allow'
 // at present building on PI is not supported, but we would only need to make
 // some changes on assumptions on what should be built (like SWT / Swing) and
 // such and we could probably make it work.
-if (!IS_MAC && !IS_WINDOWS && !IS_LINUX) fail("Unsupported build OS ${OS_NAME}")
+if (!IS_MAC && !IS_WINDOWS && !IS_LINUX && !IS_BSD) fail("Unsupported build OS ${OS_NAME}")
 if (IS_WINDOWS && OS_ARCH != "x86" && OS_ARCH != "amd64" && !IS_AARCH64) {
     logger.warn("Unknown and unsupported build architecture: $OS_ARCH")
 } else if (IS_MAC && OS_ARCH != "x86_64" && OS_ARCH != "aarch64") {
     logger.warn("Unknown and unsupported build architecture: $OS_ARCH")
 } else if (IS_LINUX && OS_ARCH != "i386" && OS_ARCH != "amd64" && !IS_AARCH64 && !IS_LOONGARCH64 && !IS_RISCV64) {
     logger.warn("Unknown and unsupported build architecture: $OS_ARCH")
+} else if (IS_BSD && OS_ARCH != "amd64" && !IS_AARCH64) {
+    logger.warn("Unknown and unsupported build architecture: $OS_ARCH")
 }
+
+// Configure make command
+ext.MAKE_CMD = IS_BSD ? "gmake" : "make"
 
 if (IS_64) {
     if (IS_AARCH64) {
@@ -444,7 +451,7 @@ defineProperty("BUILD_WORKING_LIBAV", "false")
 ext.IS_BUILD_WORKING_LIBAV = IS_LINUX ? Boolean.parseBoolean(BUILD_WORKING_LIBAV) : false
 
 // COMPILE_PANGO specifies whether to build javafx_font_pango.
-defineProperty("COMPILE_PANGO", "${IS_LINUX}")
+defineProperty("COMPILE_PANGO", "${IS_LINUX || IS_BSD}")
 ext.IS_COMPILE_PANGO = Boolean.parseBoolean(COMPILE_PANGO)
 
 // COMPILE_HARFBUZZ specifies whether to use Harfbuzz.
@@ -478,7 +485,8 @@ ext.SWT_FILE_NAME =
     IS_MAC && !IS_AARCH64 ? "org.eclipse.swt.cocoa.macosx.x86_64_${swtVersion}" :
     IS_WINDOWS ? "org.eclipse.swt.win32.win32.x86_64_${swtVersion}" :
     IS_LINUX && IS_AARCH64 ? "org.eclipse.swt.gtk.linux.aarch64_${swtVersion}" :
-    IS_LINUX && !IS_AARCH64 ? "org.eclipse.swt.gtk.linux.x86_64_${swtVersion}" : ""
+    IS_LINUX && !IS_AARCH64 ? "org.eclipse.swt.gtk.linux.x86_64_${swtVersion}" :
+    IS_FREEBSD ? files("dependencies/org.eclipse.swt.gtk.freebsd.x86_64_${swtVersion}.jar") : ""
 
 // Specifies whether to run full tests (true) or smoke tests (false)
 defineProperty("FULL_TEST", "false")
@@ -691,7 +699,7 @@ defineProperty("MAVEN_VERSION", IS_MAVEN_PUBLISH ? (IS_MILESTONE_FCS ? "${RELEAS
 // Check whether the COMPILE_TARGETS property has been specified (if so, it was done by
 // the user and not by this script). If it has not been defined then default
 // to building the normal desktop build for this machine
-project.ext.set("defaultHostTarget", IS_MAC ? "mac" : IS_WINDOWS ? "win" : IS_LINUX ? "linux" : "");
+project.ext.set("defaultHostTarget", IS_MAC ? "mac" : IS_WINDOWS ? "win" : IS_LINUX ? "linux" : IS_BSD ? "bsd" : "");
 defineProperty("COMPILE_TARGETS", "$defaultHostTarget")
 
 // Flag indicating whether to import cross compile tools
@@ -866,7 +874,7 @@ void fetchExternalTools(String configName, List packages, File destdir, boolean 
                 def File pkgdir = file("$destdir/$basename")
 
                 if (pkgname.endsWith(".tgz") || pkgname.endsWith("tar.gz")) {
-                    if (IS_LINUX || IS_MAC) {
+                    if (IS_LINUX || IS_MAC || IS_BSD) {
                         // use native tar to support symlinks
                         pkgdir.mkdirs()
                         exec {
@@ -1373,7 +1381,7 @@ compileTargets { t ->
     if (!targetProperties.containsKey('includeMonocle')) targetProperties.includeMonocle = false
     if (!targetProperties.containsKey('includeEGL')) targetProperties.includeEGL = false
 
-    if (!targetProperties.containsKey('includeGTK')) targetProperties.includeGTK = IS_LINUX
+    if (!targetProperties.containsKey('includeGTK')) targetProperties.includeGTK = IS_LINUX || IS_BSD
 
     if (!targetProperties.containsKey('modLibDest')) targetProperties.modLibDest = targetProperties.libDest
 
@@ -1514,6 +1522,8 @@ if (IS_LINUX) {
     logger.quiet("MSVC version: ${jfxBuildWindowsMsvcVersion}")
 } else if (IS_MAC) {
     logger.quiet("XCODE version: ${jfxBuildMacosxXcodeVersion}")
+} else if (IS_BSD) {
+    logger.quiet("BSD CC version: ${jfxBuildBsdCcVersion}")
 }
 logger.quiet("cmake version: ${jfxBuildCmakeVersion}")
 logger.quiet("ninja version: ${jfxBuildNinjaVersion}")
@@ -1810,7 +1820,7 @@ void addMavenPublication(Project project, List<String> projectDependencies) {
                     afterEvaluate {
                         artifact project.tasks."moduleEmptyPublicationJar$t.capital"
                         artifact project.tasks."modularPublicationJar$t.capital" {
-                            archiveClassifier.set("$t.name")
+                            archiveClassifier.set("$t.name" + (ARCH_NAME == 'x64' ? "" : "-${ARCH_NAME}"))
                         }
                     }
 
@@ -2014,9 +2024,9 @@ void addJCov(p, test) {
 
 allprojects {
 
-    // Setup the repositories that we'll download libraries from.
+    // Set up the repositories that we'll download libraries from.
     // By default we use Maven Central for most things. The custom "ivy"
-    // repo is for downloading SWT. The way it works is to setup the
+    // repo is for downloading SWT. The way it works is to set up the
     // download URL such that it will resolve to the actual jar file to
     // download. See SWT_FILE_NAME for the name of the jar that will be
     // used as the "artifact" in the pattern below.
@@ -2114,7 +2124,7 @@ allprojects {
     }
 
     // By default all of our projects require junit for testing so we can just
-    // setup this dependency here.
+    // set up this dependency here.
     dependencies {
         testImplementation group: "junit", name: "junit", version: "${junitVersion}"
         testImplementation group: "org.hamcrest", name: "hamcrest-core", version: "${hamcrestVersion}"
@@ -3032,7 +3042,10 @@ project(":swt") {
     commonModuleSetup(project, [ 'base', 'graphics' ])
 
     dependencies {
-        implementation name: SWT_FILE_NAME
+        if (IS_BSD)
+            implementation SWT_FILE_NAME
+        else
+            implementation name: SWT_FILE_NAME
     }
 
     classes {
@@ -3258,7 +3271,7 @@ project(":media") {
 
             doLast {
                 exec {
-                    commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/jfxmedia/projects/${projectDir}")
+                    commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/jfxmedia/projects/${projectDir}")
                     args("JAVA_HOME=${JDK_HOME}", "GENERATED_HEADERS_DIR=${generatedHeadersDir}",
                          "OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=jfxmedia",
                          "COMPILE_PARFAIT=${compileParfait}",
@@ -3287,7 +3300,7 @@ project(":media") {
                 enabled = IS_COMPILE_MEDIA
                 doLast {
                     exec {
-                        commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/gstreamer-lite")
+                        commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/gstreamer-lite")
                         args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=gstreamer-lite",
                              "ARCH=${ARCH_NAME}", "CC=${mediaProperties.compiler}",
                              "AR=${mediaProperties.ar}", "LINKER=${mediaProperties.linker}")
@@ -3305,7 +3318,7 @@ project(":media") {
 
                 doLast {
                     exec {
-                        commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/fxplugins")
+                        commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/fxplugins")
                         args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=fxplugins",
                              "ARCH=${ARCH_NAME}",
                              "CC=${mediaProperties.compiler}", "AR=${mediaProperties.ar}", "LINKER=${mediaProperties.linker}")
@@ -3427,7 +3440,7 @@ project(":media") {
                                 }
                                 exec {
                                     workingDir("$libavDir")
-                                    commandLine("make")
+                                    commandLine(MAKE_CMD)
                                 }
                             }
                         }
@@ -3495,7 +3508,7 @@ project(":media") {
                                 }
                                 exec {
                                     workingDir("$libavDir")
-                                    commandLine("make")
+                                    commandLine(MAKE_CMD)
                                 }
                             }
                         }
@@ -3581,7 +3594,7 @@ project(":media") {
                                 }
                                 exec {
                                     workingDir("$libavDir")
-                                    commandLine("make")
+                                    commandLine(MAKE_CMD)
                                 }
                             }
                         }
@@ -3615,7 +3628,7 @@ project(":media") {
                                 File dir = file(libavDir)
                                 if (dir.exists()) {
                                     exec {
-                                        commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
+                                        commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
                                         args("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}",
                                              "OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}",
                                              "BASE_NAME=avplugin", "VERSION=${version}", "LIBAV_DIR=${libavDir}",
@@ -3630,7 +3643,7 @@ project(":media") {
                                 File dir = file(libavDir)
                                 if (dir.exists()) {
                                     exec {
-                                        commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
+                                        commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
                                         args("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}",
                                              "OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}",
                                              "BASE_NAME=avplugin", "VERSION=${version}", "LIBAV_DIR=${libavDir}",
@@ -3645,7 +3658,7 @@ project(":media") {
                                 File dir = file(libavDir)
                                 if (dir.exists()) {
                                     exec {
-                                        commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
+                                        commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
                                         args("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}",
                                              "OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}",
                                              "BASE_NAME=avplugin", "VERSION=${version}", "LIBAV_DIR=${libavDir}",
@@ -3657,7 +3670,7 @@ project(":media") {
                         } else {
                             // Building fxavcodec plugin (libav plugin)
                             exec {
-                                commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
+                                commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/linux/avplugin")
                                 args("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}",
                                      "OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}",
                                      "BASE_NAME=avplugin", "ARCH=${ARCH_NAME}")
@@ -3708,9 +3721,9 @@ project(":media") {
                     doLast {
                         exec {
                             environment(WINDOWS_NATIVE_COMPILE_ENVIRONMENT)
-                            commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/glib-lite")
+                            commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/glib-lite")
                             args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=glib-lite",
-                                 IS_64 ? "ARCH=x64" : "ARCH=x32", "RESOURCE=${nativeOutputDir}/${buildType}/${WIN.media.glibRcFile}",
+                                 "ARCH=${ARCH_NAME}", "RESOURCE=${nativeOutputDir}/${buildType}/${WIN.media.glibRcFile}",
                                  "CC=${mediaProperties.compiler}", "AR=${mediaProperties.ar}", "LINKER=${mediaProperties.linker}")
                         }
                     }
@@ -3722,13 +3735,13 @@ project(":media") {
                     enabled = IS_COMPILE_MEDIA
                     doLast {
                         exec {
-                            commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/libffi")
+                            commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/libffi")
                             args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=ffi", "ARCH=$TARGET_ARCH")
                             args ("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}", "AR=${mediaProperties.ar}")
                         }
 
                         exec {
-                            commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/glib-lite")
+                            commandLine (MAKE_CMD, "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/glib-lite")
                             args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=glib-lite", "ARCH=$TARGET_ARCH")
                             args ("CC=${mediaProperties.compiler}", "LINKER=${mediaProperties.linker}")
                         }
@@ -5021,7 +5034,7 @@ configurations {
 }
 
 if (IS_STUB_RUNTIME_OPENJFX) {
-    def String platform = IS_MAC ? "mac" : IS_WINDOWS ? "win" : IS_LINUX ? "linux" : ""
+    def String platform = IS_MAC ? "mac" : IS_WINDOWS ? "win" : IS_LINUX ? "linux" : IS_BSD ? "bsd" : ""
     dependencies {
         openjfxStubs "org.openjfx:javafx-media:$STUB_RUNTIME_OPENJFX:$platform@jar"
         openjfxStubs "org.openjfx:javafx-web:$STUB_RUNTIME_OPENJFX:$platform@jar"
