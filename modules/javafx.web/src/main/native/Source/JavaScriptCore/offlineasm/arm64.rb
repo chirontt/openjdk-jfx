@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2024 Apple Inc. All rights reserved.
+# Copyright (C) 2011-2026 Apple Inc. All rights reserved.
 # Copyright (C) 2014 University of Szeged. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -1433,8 +1433,8 @@ class Instruction
             $asm.puts "ldr #{operands[1].arm64Operand(:quad)}, [#{operands[1].arm64Operand(:quad)}, #{operands[0].asmLabel}@GOTPAGEOFF]"
             $asm.putStr("#endif")
 
-            # On Linux, use ELF GOT relocation specifiers.
-            $asm.putStr("#elif OS(LINUX)")
+            # On Linux or BSD, use ELF GOT relocation specifiers.
+            $asm.putStr("#elif OS(LINUX) || OS(FREEBSD)")
 
             $asm.puts "adrp #{operands[1].arm64Operand(:quad)}, :got:#{operands[0].asmLabel}"
             $asm.putStr("#if CPU(ADDRESS32)")

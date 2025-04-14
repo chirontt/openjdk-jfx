@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -355,6 +355,8 @@ public class NativeLibLoader {
             relativeDir = "lib";
         } else if (PlatformUtil.isLinux()) {
             relativeDir = "lib";
+        } else if (PlatformUtil.isBSD()) {
+            relativeDir = "lib";
         }
 
         // Location of native libraries relative to java.home
@@ -374,6 +376,8 @@ public class NativeLibLoader {
         } else if (PlatformUtil.isMac()) {
             relativeDir = ".";
         } else if (PlatformUtil.isLinux()) {
+            relativeDir = ".";
+        } else if (PlatformUtil.isBSD()) {
             relativeDir = ".";
         }
 
@@ -411,6 +415,9 @@ public class NativeLibLoader {
                     libPrefix = "lib";
                     libSuffix = ".dylib";
                 } else if (PlatformUtil.isLinux()) {
+                    libPrefix = "lib";
+                    libSuffix = ".so";
+                } else if (PlatformUtil.isBSD()) {
                     libPrefix = "lib";
                     libSuffix = ".so";
                 }

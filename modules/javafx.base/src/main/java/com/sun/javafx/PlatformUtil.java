@@ -47,6 +47,7 @@ public class PlatformUtil {
         loadProperties();
     }
 
+    private static final boolean BSD = OS.endsWith("BSD");
     private static final boolean ANDROID = "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name"));
     private static final boolean WINDOWS = OS.startsWith("Windows");
     private static final boolean MAC = OS.startsWith("Mac");
@@ -54,6 +55,13 @@ public class PlatformUtil {
     private static final boolean SOLARIS = OS.startsWith("SunOS");
     private static final boolean IOS = OS.startsWith("iOS");
     private static final boolean STATIC_BUILD = "Substrate VM".equals(System.getProperty("java.vm.name"));
+
+    /**
+     * Returns true if the operating system is a form of BSD.
+     */
+    public static boolean isBSD(){
+        return BSD;
+    }
 
     /**
      * Returns true if the operating system is a form of Windows.
@@ -77,10 +85,10 @@ public class PlatformUtil {
     }
 
     /**
-     * Returns true if the operating system is a form of Linux or Solaris
+     * Returns true if the operating system is a form of Linux, Solaris or BSD
      */
     public static boolean isUnix() {
-        return LINUX || SOLARIS;
+        return LINUX || SOLARIS || BSD;
     }
 
     /**

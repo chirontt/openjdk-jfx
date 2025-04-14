@@ -351,13 +351,13 @@ class GlassSystemMenu implements TKSystemMenu {
         } else if (accelerator instanceof KeyCodeCombination) {
             KeyCodeCombination kcc  = (KeyCodeCombination)accelerator;
             KeyCode            code = kcc.getCode();
-            assert PlatformUtil.isMac() || PlatformUtil.isLinux();
+            assert PlatformUtil.isBSD() || PlatformUtil.isMac() || PlatformUtil.isLinux();
             int modifier = glassModifiers(kcc);
             if (PlatformUtil.isMac()) {
                 int finalCode = code.isLetterKey() ? code.getChar().toUpperCase().charAt(0)
                         : code.getCode();
                 glassSubMenuItem.setShortcut(finalCode, modifier);
-            } else if (PlatformUtil.isLinux()) {
+            } else if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) {
                 String lower = code.getChar().toLowerCase();
                 if ((modifier & KeyEvent.MODIFIER_CONTROL) != 0) {
                     glassSubMenuItem.setShortcut(lower.charAt(0), modifier);
@@ -386,14 +386,14 @@ class GlassSystemMenu implements TKSystemMenu {
             ret += KeyEvent.MODIFIER_ALT;
         }
         if (kcc.getShortcut() == KeyCombination.ModifierValue.DOWN) {
-            if (PlatformUtil.isLinux()) {
+            if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) {
                 ret += KeyEvent.MODIFIER_CONTROL;
             } else if (PlatformUtil.isMac()) {
                 ret += KeyEvent.MODIFIER_COMMAND;
             }
         }
         if (kcc.getMeta() == KeyCombination.ModifierValue.DOWN) {
-            if (PlatformUtil.isLinux()) {
+            if (PlatformUtil.isBSD() || PlatformUtil.isLinux()) {
                 ret += KeyEvent.MODIFIER_WINDOWS;   // JDK-8127216 - Linux shortcut support
             } else if (PlatformUtil.isMac()) {
                 ret += KeyEvent.MODIFIER_COMMAND;
