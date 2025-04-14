@@ -53,6 +53,7 @@ public class PlatformUtil {
         useEGL = Boolean.getBoolean("use.egl");
     }
 
+    private static final boolean BSD = os.endsWith("BSD");
     private static final boolean ANDROID = "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name"));
     private static final boolean WINDOWS = os.startsWith("Windows");
     private static final boolean MAC = os.startsWith("Mac");
@@ -61,6 +62,13 @@ public class PlatformUtil {
     private static final boolean IOS = os.startsWith("iOS");
     private static final boolean STATIC_BUILD = "Substrate VM".equals(System.getProperty("java.vm.name"));
     private static final boolean HEADLESS = "headless".equals(embeddedType);
+
+    /**
+     * Returns true if the operating system is a form of BSD.
+     */
+    public static boolean isBSD(){
+        return BSD;
+    }
 
     /**
      * Returns true if the operating system is a form of Windows.
@@ -88,10 +96,10 @@ public class PlatformUtil {
     }
 
     /**
-     * Returns true if the operating system is a form of Linux or Solaris
+     * Returns true if the operating system is a form of Linux, Solaris or BSD
      */
     public static boolean isUnix(){
-        return LINUX || SOLARIS;
+        return LINUX || SOLARIS || BSD;
     }
 
     /**
