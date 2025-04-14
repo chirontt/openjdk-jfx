@@ -356,6 +356,8 @@ GstElement* CGstPipelineFactory::CreateAudioSinkElement()
     return CreateElement("osxaudiosink");
 #elif  TARGET_OS_LINUX
     return CreateElement("alsasink");
+#elif TARGET_OS_BSD
+    return CreateElement("bsdaudiosink");
 #else
     return NULL;
 #endif
