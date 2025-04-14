@@ -1,0 +1,96 @@
+#
+# Copyright (c) 2026, Oracle and/or its affiliates. All rights reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 2 only, as
+# published by the Free Software Foundation.  Oracle designates this
+# particular file as subject to the "Classpath" exception as provided
+# by Oracle in the LICENSE file that accompanied this code.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# version 2 for more details (a copy is included in the LICENSE file that
+# accompanied this code).
+#
+# You should have received a copy of the GNU General Public License version
+# 2 along with this work; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+# or visit www.oracle.com if you need additional information or have any
+# questions.
+#
+
+#
+# This GitHub actions YAML file runs a build and test on the Windows Arm64 platform.
+#
+# The build step is run in the default mode without building the native media or webkit libraries.
+# The test is run with web tests excluded. As a follow-up enhancement, we might consider optionally
+# building the media and webkit libraries.
+#
+
+name: JavaFX win-aarch64 build & tests
+
+on:
+  # Enable triggering the workflow manually
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  JDK_VERSION: '26'
+  JDK_DISTRIBUTION: 'liberica'
+
+jobs:
+  validation:
+    name: Gradle Wrapper Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: gradle/actions/wrapper-validation@v6
+
+  windows_aarch64_build:
+    name: Windows 11 on Arm64
+    needs: validation
+    runs-on: windows-11-arm
+
+    steps:
+      - name: Checkout the source
+        uses: actions/checkout@v7
+        with:
+          path: jfx
+
+      - name: Set up the JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: ${{ env.JDK_DISTRIBUTION }}
+          java-version: ${{ env.JDK_VERSION }}
+          java-package: jdk
+          cache: 'gradle'
+
+      - name: Build JavaFX artifacts
+        working-directory: jfx
+        run: |
+          echo "dir ...\VC\Tools\MSVC"
+          dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC"
+          echo "JAVA_HOME=$env:JAVA_HOME"
+          echo "ANT_HOME=$env:ANT_HOME"
+          echo "Path=$env:Path"
+          which ant
+          ant -version
+          which java
+          java -version
+          .\gradlew.bat -version
+          .\gradlew.bat --info -PCHMOD_ARTIFACTS=false all
+
+      - name: Run JavaFX headless tests
+        working-directory: jfx
+        run: |
+          echo "JAVA_HOME=$env:JAVA_HOME"
+          echo "ANT_HOME=$env:ANT_HOME"
+          echo "Path=$env:Path"
+          .\gradlew.bat --info --continue -PTEST_ONLY=true test -x :web:test
+
