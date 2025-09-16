@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -43,7 +43,9 @@ final class Platform {
             String userPlatform = System.getProperty("glass.platform");
 
             if (userPlatform != null) {
-                if (userPlatform.equals("macosx"))
+                if (userPlatform.endsWith("bsd"))
+                   type = GTK;
+                else if (userPlatform.equals("macosx"))
                    type = MAC;
                 else if (userPlatform.equals("windows"))
                    type = WINDOWS;
@@ -62,6 +64,8 @@ final class Platform {
                 type = MAC;
             } else if (PlatformUtil.isWindows()) {
                 type = WINDOWS;
+            } else if (PlatformUtil.isBSD()) {
+                type = GTK;
             } else if (PlatformUtil.isLinux()) {
                 type = GTK;
             } else if (PlatformUtil.isIOS()) {

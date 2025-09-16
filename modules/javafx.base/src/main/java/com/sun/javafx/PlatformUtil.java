@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -61,6 +61,7 @@ public class PlatformUtil {
         }
     }
 
+    private static final boolean BSD = os.endsWith("BSD");
     private static final boolean ANDROID = "android".equals(javafxPlatform) || "Dalvik".equals(System.getProperty("java.vm.name"));
     private static final boolean WINDOWS = os.startsWith("Windows");
     private static final boolean WINDOWS_VISTA_OR_LATER = WINDOWS && versionNumberGreaterThanOrEqualTo(6.0f);
@@ -86,6 +87,13 @@ public class PlatformUtil {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    /**
+     * Returns true if the operating system is a form of BSD.
+     */
+    public static boolean isBSD(){
+        return BSD;
     }
 
     /**
@@ -147,10 +155,10 @@ public class PlatformUtil {
     }
 
     /**
-     * Returns true if the operating system is a form of Linux or Solaris
+     * Returns true if the operating system is a form of Linux, Solaris or BSD
      */
     public static boolean isUnix(){
-        return LINUX || SOLARIS;
+        return LINUX || SOLARIS || BSD;
     }
 
     /**
