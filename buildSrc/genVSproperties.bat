@@ -47,7 +47,7 @@ if not "%VSCOMNTOOLS%"=="" (
 ) else if not "%VS150COMNTOOLS%"=="" (
     set "VSTOOLSDIR=%VS150COMNTOOLS%"
 ) else (
-    for %%a in (2022, 2019, 2017) do (
+    for %%a in (18, 2022, 2019, 2017) do (
         set year=%%a
         for %%b in (Enterprise, Professional, Community, BuildTools) do (
             set edition=%%b
