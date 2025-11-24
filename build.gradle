@@ -467,9 +467,11 @@ defineProperty("BUILD_TOOLS_DOWNLOAD_SCRIPT", "")
 ext.SWT_FILE_NAME =
     IS_MAC && IS_AARCH64 ? "org.eclipse.swt.cocoa.macosx.aarch64_${swtVersion}" :
     IS_MAC && !IS_AARCH64 ? "org.eclipse.swt.cocoa.macosx.x86_64_${swtVersion}" :
-    IS_WINDOWS ? "org.eclipse.swt.win32.win32.x86_64_${swtVersion}" :
+    IS_WINDOWS && IS_AARCH64 ? "org.eclipse.swt.win32.win32.aarch64_${swtVersion}" :
+    IS_WINDOWS && !IS_AARCH64 ? "org.eclipse.swt.win32.win32.x86_64_${swtVersion}" :
     IS_LINUX && IS_AARCH64 ? "org.eclipse.swt.gtk.linux.aarch64_${swtVersion}" :
-    IS_LINUX && !IS_AARCH64 ? "org.eclipse.swt.gtk.linux.x86_64_${swtVersion}" : ""
+    IS_LINUX && IS_RISCV64 ? "org.eclipse.swt.gtk.linux.riscv64_${swtVersion}" :
+    IS_LINUX && IS_64 ? "org.eclipse.swt.gtk.linux.x86_64_${swtVersion}" : ""
 
 // Specifies whether to run full tests (true) or smoke tests (false)
 defineProperty("FULL_TEST", "false")
@@ -3697,7 +3699,7 @@ project(":media") {
                             environment(WINDOWS_NATIVE_COMPILE_ENVIRONMENT)
                             commandLine ("make", "${makeJobsFlag}", "-C", "${nativeSrcDir}/gstreamer/projects/${projectDir}/glib-lite")
                             args("OUTPUT_DIR=${nativeOutputDir}", "BUILD_TYPE=${buildType}", "BASE_NAME=glib-lite",
-                                 IS_64 ? "ARCH=x64" : "ARCH=x32", "RESOURCE=${nativeOutputDir}/${buildType}/${WIN.media.glibRcFile}",
+                                 "ARCH=${ARCH_NAME}", "RESOURCE=${nativeOutputDir}/${buildType}/${WIN.media.glibRcFile}",
                                  "CC=${mediaProperties.compiler}", "AR=${mediaProperties.ar}", "LINKER=${mediaProperties.linker}")
                         }
                     }
